@@ -2,19 +2,14 @@
 var indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB || window.shimIndexedDB;
 
 // Open (or create) the database
-var request = indexedDB.open("testdb");
+var request = indexedDB.open("test1");
 
 // Create the schema
 request.onupgradeneeded = function (event) {
-    var db = event.target.result;
+    var db = request.result;
     console.log("Object Store creation");
     var objectstore = db.createObjectStore("client", { autoIncrement: true,});
-    objectstore.createIndex("name", "name", { unique: false });
-    objectstore.createIndex("lastName", "lastName", { unique: false });
-    objectstore.createIndex("email", "email", { unique: true});
-    objectstore.createIndex("ID", "ID", { unique: true }); //HERE WAS THE PROBLEM
-    objectstore.createIndex("postal", "postal", { unique: false });
-    objectstore.createIndex("phoneNumber", "phoneNumber", { unique: true});
+    objectstore.createIndex("name", "name", { unique: false });    
 }
 
 request.onerror = function() {    
@@ -28,17 +23,14 @@ request.onsuccess = function() {
 }
 
 function addNew(){ 
-    var newrequest = indexedDB.open("testdb"); 
+    console.log("Adding");
+    var db = request.result;
     
-    newrequest.onsuccess = function (event) {
-        var db = event.target.result; 
-        var objectstore = db.transaction(["client"], 'readwrite').objectStore("client");
-        for (var i in clientData) {
-            objectstore.add(clientData[i]); // Here was the error thrown
-        }
-        db.close();
-        console.log("finished!");
-    }   
+    var tx = db.transaction("client", "readwrite");
+    var store = tx.objectStore("client");
+    var index = store.index("name");
+    
+    store.put({ name: document.getElementById("newusername").value, age: 42});   
 };
         
     

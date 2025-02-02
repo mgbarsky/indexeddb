@@ -2,18 +2,25 @@
 var indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB || window.shimIndexedDB;
 
 // Open (or create) the database
-var open = indexedDB.open("MyDatabase", 1);
+var request = indexedDB.open("MyDatabase", 1);
 
 // Create the schema
-open.onupgradeneeded = function() {
-    var db = open.result;
+request.onupgradeneeded = function() {
+    var db = request.result;
     var store = db.createObjectStore("MyObjectStore", {keyPath: "id"});
     var index = store.createIndex("NameIndex", ["name.last", "name.first"]);
+
+
 };
 
-open.onsuccess = function() {
+request.onerror = function() {
+    console.log("error");
+}
+
+request.onsuccess = function() {
     // Start a new transaction
-    var db = open.result;
+    console.log("Connected!");
+    var db = request.result;
     var tx = db.transaction("MyObjectStore", "readwrite");
     var store = tx.objectStore("MyObjectStore");
     var index = store.index("NameIndex");
